@@ -32,6 +32,7 @@ fig.suptitle(os.path.relpath(waveFile).replace('.cfg', ''))
 for i in range(0, count):
     plt.subplot(row, column, i+1)
     plt.plot(parser.t, parser.analog[i].data(), label=parser.analog[i].ch_id) 
+    plt.legend()
 figFile = waveFile.replace('.cfg', '.pdf')
 plt.savefig(figFile)
 plt.show()
