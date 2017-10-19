@@ -1,0 +1,37 @@
+#!/usr/local/bin/python3
+import matplotlib.pyplot as plt
+import os
+import sys
+import comtrade
+
+from pylab import *  
+mpl.rcParams['font.family'] = ['SimHei'] #指定默认字体  
+mpl.rcParams['axes.unicode_minus'] = False #解决保存图像是负号'-'显示为方块的问题 
+
+if len(sys.argv) == 2:
+    waveFile = os.path.abspath(sys.argv[1])
+    if not os.path.exists(waveFile):
+        print('\nThe file doesn\'t exist, please select a valid contrade configuration file!\n')
+        sys.exit(1)
+else:
+    print('\nExample: comtrade file')
+    print('  file: the cfg or dat file you want to parse\n')
+    sys.exit(1)
+if '.dat' in waveFile:
+    waveFile = waveFile.replace('.dat', '.cfg')
+parser = comtrade.ComtradeParser(waveFile)
+if parser.result != 'parsed':
+    print('\nParse failed! Error: %s\n' % parser.result)
+    sys.exit(1)
+plt.close('all')
+count = len(parser.analog)
+row = (count // 2) + (count % 2)
+column = 2
+fig = plt.figure(figsize=(16,count*1))
+fig.suptitle(os.path.relpath(waveFile).replace('.cfg', ''))
+for i in range(0, count):
+    plt.subplot(row, column, i+1)
+    plt.plot(parser.t, parser.analog[i].data(), label=parser.analog[i].ch_id) 
+figFile = waveFile.replace('.cfg', '.pdf')
+plt.savefig(figFile)
+plt.show()
