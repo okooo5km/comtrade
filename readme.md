@@ -17,8 +17,8 @@ pip3 install matplotlib numpy
 
 ### 文件说明
 
-- comtrade: comtrade文件解析工具，是命令行工具，传入参数为comtrade的cfg文件或者dat文件；
-- comtrade.py: comtrade解析库，包含解析comtrade文件需要的类，使用方法参考 [comtrade](./comtrade) 的内容；
+- **comtrade**: comtrade文件解析工具，是命令行工具，传入参数为comtrade的cfg文件或者dat文件；
+- **comtrade.py**: comtrade解析库，包含解析comtrade文件需要的类，使用方法参考 [comtrade](./comtrade) 的内容；
 
 ### 功能
 
