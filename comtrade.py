@@ -222,6 +222,12 @@ class ComtradeData:
                 index = (ch // 16) * 2 + digitalIndex
                 raw = struct.unpack('h', data[index:index+2])[0] 
                 self.config.digitalInfo[ch].appendData(raw)
+        self._analog = {}
+        self._digital = {}
+        for each in self.config.analogInfo:
+            self._analog[each.ch_id + '(%s)' % each.unit] = each.data()
+        for each in self.config.digitalInfo:
+            self._digital[each.ch_id] = each.data()
         self.result = 'parsed'
 
     def t(self):
@@ -232,15 +238,15 @@ class ComtradeData:
 
     def analog(self):
         if self.result == 'parsed':
-            return self.config.analogInfo
+            return self._analog
         else:
-            return [np.zeros(0)]
+            return {}
     
     def digital(self):
         if self.result == 'parsed':
-            return self.config.digitalInfo
+            return self._digital
         else:
-            return [np.zeros(0)]
+            return {}
 
 class ComtradeParser:
     def __init__(self, path):
@@ -256,8 +262,8 @@ class ComtradeParser:
         self.path = path
         self.result = 'parsing'
         self.config = ComtradeConfig(self.path + '.cfg')
-        self.data = ComtradeData(self.config)
-        self.analog = self.data.analog()
-        self.digital = self.data.digital()
+        self.dat = ComtradeData(self.config)
+        self.analog = self.dat.analog()
+        self.digital = self.dat.digital()
         self.result = 'parsed'
-        self.t = self.data.t()
+        self.t = self.dat.t()

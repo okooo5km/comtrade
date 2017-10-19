@@ -17,21 +17,26 @@ else:
     print('\nExample: comtrade file')
     print('  file: the cfg or dat file you want to parse\n')
     sys.exit(1)
+
 if '.dat' in waveFile:
     waveFile = waveFile.replace('.dat', '.cfg')
+
 parser = comtrade.ComtradeParser(waveFile)
 if parser.result != 'parsed':
     print('\nParse failed! Error: %s\n' % parser.result)
     sys.exit(1)
+
 plt.close('all')
 count = len(parser.analog)
-row = (count // 2) + (count % 2)
+row = count // 2 + (count % 2)
 column = 2
-fig = plt.figure(figsize=(16,count*1))
+fig = plt.figure(figsize=(16, count*1))
 fig.suptitle(os.path.relpath(waveFile).replace('.cfg', ''))
-for i in range(0, count):
-    plt.subplot(row, column, i+1)
-    plt.plot(parser.t, parser.analog[i].data(), label=parser.analog[i].ch_id) 
+subplotN = 1
+for key, data in parser.analog.items():
+    plt.subplot(row, column, subplotN)
+    subplotN += 1
+    plt.plot(parser.t, data, label=key) 
     plt.legend()
 figFile = waveFile.replace('.cfg', '.pdf')
 plt.savefig(figFile)
