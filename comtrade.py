@@ -1,9 +1,28 @@
+"""
+comtrade module:
+    you can use ComtradeParser class to parse a series of comtrade wave file, 
+    a entire comtrade wave files include: cfg file and dat file.
+
+    The ComtradeParser class can identify cfg or dat file, and will check if
+    cfg file and dat file all exist, then to read the raw data and plot the 
+    wave figure, it can also save the figure as pdf file.
+
+    For eaxmple:
+        parser = ComtradeParser('1.cfg')
+        # 1. parser.analog: a dict for analog channel data;
+        # 2. parser.digital: a dict for digital channel data;
+        # 3. parser.result: record the parse result for comtrade file
+"""
+
 import numpy as np
 import os.path as op
 import struct
 
 class AnalogInfo:
-    'Comtrade config file: Analog channel info'
+    """
+    Comtrade config file: Analog channel info
+    including the analog channel data information
+    """
     def __init__(self, infoStr='1,UA,A,FI,V,1,0,0,-32767,32767,1,1,p'):
         self.str = infoStr.replace('\n', '')
         buf = self.str.split(',')
@@ -34,7 +53,10 @@ class AnalogInfo:
     __str__ = __repr__
         
 class DigitalInfo:
-    'Comtrade config file: Digital channel info'
+    """
+    Comtrade config file: Digital channel info
+    including the digital channel data information
+    """
     def __init__(self, infoStr='1,ASOE,,,0'):
         self.str = infoStr.replace('\n', '')
         buf = self.str.split(',')
