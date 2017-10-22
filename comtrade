@@ -26,18 +26,20 @@ if parser.result != 'parsed':
     print('\nParse failed! Error: %s\n' % parser.result)
     sys.exit(1)
 
-plt.close('all')
 count = len(parser.analog)
 row = count // 2 + (count % 2)
 column = 2
-fig = plt.figure(figsize=(16, count*1))
-fig.suptitle(os.path.relpath(waveFile).replace('.cfg', ''))
+
+plt.close('all')
+plt.figure(figsize=(16, count*1))
+plt.suptitle(os.path.relpath(waveFile).replace('.cfg', '') + '模拟通道数据')
 subplotN = 1
 for key, data in parser.analog.items():
     plt.subplot(row, column, subplotN)
     subplotN += 1
     plt.plot(parser.t, data, label=key) 
     plt.legend()
+
 figFile = waveFile.replace('.cfg', '.pdf')
 plt.savefig(figFile)
 plt.show()
