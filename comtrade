@@ -1,12 +1,7 @@
 #!/usr/local/bin/python3
-import matplotlib.pyplot as plt
 import os
 import sys
 import comtrade
-
-from pylab import *  
-mpl.rcParams['font.family'] = ['SimHei'] #指定默认字体  
-mpl.rcParams['axes.unicode_minus'] = False #解决保存图像是负号'-'显示为方块的问题 
 
 mode = 'normal'
 if len(sys.argv) == 2:
@@ -34,21 +29,7 @@ if parser.result != 'parsed':
     print('\nParse failed! Error: %s\n' % parser.result)
     sys.exit(1)
 
-count = len(parser.analog)
-row = count // 2 + (count % 2)
-column = 2
-
-plt.close('all')
-plt.figure(figsize=(16, count*1))
-plt.suptitle(os.path.relpath(waveFile).replace('.cfg', '') + '模拟通道数据')
-subplotN = 1
-for key, data in parser.analog.items():
-    plt.subplot(row, column, subplotN)
-    subplotN += 1
-    plt.plot(parser.t, data, label=key) 
-    plt.legend()
-
-figFile = waveFile.replace('.cfg', '.pdf')
-plt.savefig(figFile)
+parser.plot()
+parser.savefig()
 if mode != 'quiet':
-    plt.show()
+    parser.show()

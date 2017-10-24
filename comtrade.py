@@ -13,10 +13,14 @@ comtrade module:
         # 2. parser.digital: a dict for digital channel data;
         # 3. parser.result: record the parse result for comtrade file
 """
-
+import matplotlib.pyplot as plt
 import numpy as np
 import os.path as op
 import struct
+
+from pylab import *  
+mpl.rcParams['font.family'] = ['SimHei'] #指定默认字体  
+mpl.rcParams['axes.unicode_minus'] = False #解决保存图像是负号'-'显示为方块的问题 
 
 class AnalogInfo:
     """
@@ -271,6 +275,16 @@ class ComtradeData:
             return {}
 
 class ComtradeParser:
+    """
+    comtrade parser
+    1. check the path and parse the comtrade cfg and dat file. 
+    2. can plot the wave figure and save the pic:
+      - plot method can make the fig;
+      - show method can show the fig;
+      - saveFig method can save the fig as you want format: png, pdf, ps, eps and svg
+    Tip:
+      before using savefig and show method, should plot
+    """
     def __init__(self, path):
         self.result = 'none'
         if not '.cfg' in path:
@@ -289,3 +303,56 @@ class ComtradeParser:
         self.digital = self.dat.digital()
         self.result = 'parsed'
         self.t = self.dat.t()
+
+    def show(self):
+        """
+        show the plot result
+        """
+        if self.result == 'parsed':
+            plt.show()
+
+    def savefig(self, figFormat='pdf'):
+        """
+        save the plot result as picture, figFormat:
+        - png, pdf, ps, eps and svg
+        """
+        if self.result == 'parsed':
+            figName = self.path + '_' \
+                    + self.plotchannel \
+                    + '.' + figFormat
+            if figFormat == 'png':
+                plt.savefig(figName, dpi=300)
+            else:
+                plt.savefig(figName)
+
+    def plot(self, chType='analog'):
+        """
+        plot the wave figure, chType default value is analog
+        chType:
+          - analog: plot for the annalog channel data
+          - digital: plot for the digital channel data
+        """
+        if self.result == 'parsed':
+            data = {};
+            title = ''
+            self.plotchannel = chType.upper()
+            if chType == 'analog':
+                data = self.analog
+                temp = self.path.split('/')[-1]
+                title = temp + '模拟通道数据'
+            else:
+                data = self.digital
+                temp = self.path.split('/')[-1]
+                title = temp + '数字通道数据'
+            count = len(data)
+            row = count // 2 + (count % 2)
+            column = 2
+            plt.close('all')
+            plt.figure(figsize=(16, count*1))
+            plt.suptitle(title)
+            subplotN = 1
+            for key, data in data.items():
+                plt.subplot(row, column, subplotN)
+                subplotN += 1
+                plt.plot(self.t, data, label=key) 
+                plt.legend()
