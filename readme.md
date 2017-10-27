@@ -22,7 +22,7 @@ pip3 install matplotlib numpy
 - **comtrade**: comtrade文件解析工具，是命令行工具，传入参数为comtrade的cfg文件或者dat文件；
 - **comtrade.py**: comtrade解析模块，包含解析comtrade文件需要的类，使用方法参考 [comtrade](./comtrade) 的内容；
 
-### 功能
+### 命令行工具功能
 
 可以转换(并显示)comtrade波形文件，支持转换指定目录下的多个波形文件。帮助信息：
 
@@ -58,6 +58,13 @@ Example:
 - [x] 解析二进制的dat文件
 - [ ] 解析文本的dat文件
 
-#### 显示并保存模拟波形
+#### 需要实现
 
-默认保存图像为pdf格式。
+- [x] 支持导出波形矢量图或位图文件
+- [ ] 支持转换为csv文件
+- [x] 支持显示波形窗口
+- [x] 支持转换指定目录下的comtrade文件
+- [ ] 支持指定绘制数据类型: analog 或 digital 或 all
+- [ ] 支持指定转换后文件的输出目录
+- [ ] 支持解析ascii格式的dat文件
+
