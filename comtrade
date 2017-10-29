@@ -12,8 +12,10 @@ Usage:\n\
 options:\n\
   -h: print the help infomation\n\
   -s: show the figure window\n\
+  -c: specify channel type to plot\n\
   -f: set the file format convert to, with args specifying file format\n\n\
 args:\n\
+  channel type: all, analog, digital\n\
   format: pdf, png, eps, svg, ps, csv\n\n\
 file/dir:\n\
   file: specify a couple of comtrade files\n\
@@ -24,6 +26,7 @@ Example:\n\
   comtrade -f png xxx.cfg\n"
 
 formatList = ['png', 'pdf', 'ps', 'svg', 'csv', 'eps']
+chtypeList = ['all', 'analog', 'digital']
 
 def printinfo():
     print(helpinfo)
@@ -35,6 +38,7 @@ def initargs():
     argdict = dict()
     argdict['-h'] = False
     argdict['-s'] = False
+    argdict['-c'] = 'analog'
     argdict['-f'] = 'pdf'
     argdict['object'] = 'file'
     argdict['path'] = ''
@@ -54,6 +58,16 @@ def parseargs(argdict, args=sys.argv):
                     argdict['-h'] = True
                 elif args[i] == '-s':
                     argdict['-s'] = True
+                elif args[i] == '-c':
+                    if i >= length - 1:
+                        print("the option -c has no specified format, please check help info: comtrade -h")
+                        sys.exit(1)
+                    else:
+                        if args[i+1] in chtypeList:
+                            argdict['-c'] = args[i+1]
+                        else:
+                            print('the channel type is not supported, you can specify: all, analog or digital!')
+                            sys.exit(1)
                 elif args[i] == '-f':
                     if i >= length - 1:
                         print("the option -f has no specified format, please check help info: comtrade -h")
@@ -89,15 +103,13 @@ def parseargs(argdict, args=sys.argv):
         argdict['path'] = fileordir
     return argdict
 
-def parsewave(wavefile):
+def parsewave(wavefile, chtype='analog'):
     """
     parse the cfg file
     """
     parser = comtrade.ComtradeParser(wavefile)
-    if parser.result != 'parsed':
-        print('\nParse failed! Error: %s\n' % parser.result)
-        sys.exit(1)
-    parser.plot()
+    if parser.result == 'parsed':
+        parser.plot(chtype)
     return parser
 
 def scancfgfile(dirpath):
@@ -120,11 +132,15 @@ if argdict['-h'] == True:
 
 if argdict['object'] == 'file':
     print('parsing the file: %s ...' % argdict['path'])
-    parser = parsewave(argdict['path'])
-    parser.savefig(argdict['-f'])
-    print('parsed!')
-    if argdict['-s'] == True:
-        parser.show()
+    parser = parsewave(argdict['path'], argdict['-c'])
+    if parser.result == 'parsed':
+        print('parsed! Export the %s file of channel-%s ...' % (argdict['-f'], argdict['-c']))
+        parser.savefig(argdict['-f'])
+        print('Done!')
+        if argdict['-s'] == True:
+            parser.show()
+    else:
+        print('\nParse [%s] failed! Error: %s\n' % (argdict['path'], parser.result))
 else:
     cfgfiles = scancfgfile(argdict['path'])
     if len(cfgfiles) == 0:
@@ -133,7 +149,11 @@ else:
     print("parsing the %d file:" % len(cfgfiles))
     for cfgfile in cfgfiles:
         print("  %s ..." % cfgfile)
-        parser = parsewave(cfgfile)
-        parser.savefig(argdict['-f'])
-    print('Finished!')
+        parser = parsewave(cfgfile, argdict['-c'])
+        if parser.result == 'parsed':
+            print('    parsed! Export the %s file of %s channel ...' % (argdict['-f'], argdict['-c']))
+            parser.savefig(argdict['-f'])
+        else:
+            print('\nParse [%s] failed! Error: %s\n' % (argdict['path'], parser.result))
+    print('Done!')
 

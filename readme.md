@@ -64,7 +64,7 @@ Example:
 - [ ] 支持转换为csv文件
 - [x] 支持显示波形窗口
 - [x] 支持转换指定目录下的comtrade文件
-- [ ] 支持指定绘制数据类型: analog 或 digital 或 all
+- [x] 支持指定绘制数据类型: analog 或 digital 或 all
 - [ ] 支持指定转换后文件的输出目录
 - [ ] 支持解析ascii格式的dat文件
 

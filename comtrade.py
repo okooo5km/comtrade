@@ -340,10 +340,14 @@ class ComtradeParser:
                 data = self.analog
                 temp = self.path.split('/')[-1]
                 title = temp + '模拟通道数据'
-            else:
+            elif chType == 'digital':
                 data = self.digital
                 temp = self.path.split('/')[-1]
                 title = temp + '数字通道数据'
+            else:
+                data = dict(self.analog, **self.digital)
+                temp = self.path.split('/')[-1]
+                title = temp + '所有通道'
             count = len(data)
             row = count // 2 + (count % 2)
             column = 2
