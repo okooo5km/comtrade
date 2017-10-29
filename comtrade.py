@@ -304,6 +304,27 @@ class ComtradeParser:
         self.result = 'parsed'
         self.t = self.dat.t()
 
+    def _savecsvdata(self,filePath , chtype='analog'):
+        chtype = chtype.lower()
+        if chtype == 'analog':
+            rawdict = self.analog
+        elif chtype == 'digital':
+            rawdict = self.digital
+        else:
+            rawdict = dict(self.analog, **self.digital)
+        datalist = list(rawdict.values())
+        datamatrix = np.array(datalist)
+        csvdata = datamatrix.transpose()
+        np.savetxt(filePath, csvdata, fmt='%.2f', delimiter=',')
+        f = open(filePath, 'r')
+        lines = f.readlines()
+        f.close()
+        tablehead = ','.join(rawdict.keys()) + '\n'
+        lines.insert(0, tablehead)
+        f = open(filePath, 'w')
+        f.writelines(lines)
+        f.close()
+
     def show(self):
         """
         show the plot result
@@ -322,6 +343,8 @@ class ComtradeParser:
                     + '.' + figFormat
             if figFormat == 'png':
                 plt.savefig(figName, dpi=300)
+            elif figFormat == 'csv':
+                self._savecsvdata(figName, self.plotchannel)
             else:
                 plt.savefig(figName)
 
