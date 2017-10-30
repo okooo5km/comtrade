@@ -303,6 +303,7 @@ class ComtradeParser:
         self.digital = self.dat.digital()
         self.result = 'parsed'
         self.t = self.dat.t()
+        self.fs = self.config.sampleInfo[0].rate
 
     def _savecsvdata(self,filePath , chtype='analog'):
         chtype = chtype.lower()
