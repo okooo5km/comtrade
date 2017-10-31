@@ -6,12 +6,23 @@ import sys
 
 helpinfo = "\ncomtrade can convert comtrade files to pic file or csv data file. \
 The tool can also show the wave figure. Addionally, \
-It can convert multiple files in the dir.\n\n\
+It can convert multiple files in the dir. And it can diff two or more files to show \
+data property!\n\n\
 Usage:\n\
-  comtrade [options [args]] [file/dir]\n\n\
+  comtrade subcommand [options [args]] [file/dir]\n\n\
+subcommand:\n\
+  convert: convert the comtrade data to pic file or csv file;\n\
+  diff: diff two or more wave data with speciied mode;\n\
+  help: print comtrade help info or print specified sub-command help info;\n\
+  show: show a wave figure for specify comtrade cfg file or dat file;\n\
+\n\
+  get help info of sub command:\n\
+    comtrade help [subcommand]\n"
+
+converthelpinfo = "\nconvert command can convert the specified comtrade files to \
+specified format file.\n\
 options:\n\
   -h: print the help infomation\n\
-  -s: show the figure window\n\
   -c: specify channel type to plot\n\
   -f: set the file format convert to, with args specifying file format\n\n\
 args:\n\
@@ -23,19 +34,49 @@ file/dir:\n\
 Default:\n\
   default format is pdf.\n\n\
 Example:\n\
-  comtrade -f png xxx.cfg\n"
+  comtrade convert -f png xxx.cfg\n"
 
+showhelpinfo = "\nshow command can show wave figure of the specified comtrade files.\n\
+options:\n\
+  -h: print the help infomation\n\
+  -c: specify channel type to plot\n\
+  -f: set the file format convert to, with args specifying file format\n\n\
+args:\n\
+  channel type: all, analog, digital\n\
+  format: pdf, png, eps, svg, ps, csv\n\n\
+file/dir:\n\
+  file: specify a couple of comtrade files\n\
+  dir: specify a direction, convert the files in the direction\n\n\
+Default:\n\
+  default format is pdf.\n\n\
+Example:\n\
+  comtrade show -f png xxx.cfg\n"
+
+diffhelpinfo = "diff command"
+
+subcommandList = ['convert', 'show', 'diff', 'help']
 formatList = ['png', 'pdf', 'ps', 'svg', 'csv', 'eps']
 chtypeList = ['all', 'analog', 'digital']
+helpinfoList = {}
 
-def printinfo():
-    print(helpinfo)
+def printinfo(info):
+    print(info)
+
+def inithelpinfo():
+    helpinfoList = {}
+    helpinfoList['convert'] = converthelpinfo
+    helpinfoList['show'] = showhelpinfo
+    helpinfoList['diff'] = diffhelpinfo
+    helpinfoList['help'] = helpinfo
+    return helpinfoList
         
 def initargs():
     """
     init the args dictionary
     """
     argdict = dict()
+    argdict['subcommand'] = 'convert'
+    argdict['help'] = ''
     argdict['-h'] = False
     argdict['-s'] = False
     argdict['-c'] = 'analog'
@@ -51,13 +92,33 @@ def parseargs(argdict, args=sys.argv):
     2. args: sys.argv
     """
     length = len(args)
-    for i in range(1, length):
+    if length == 1:
+        printinfo(helpinfoList['help'])
+        sys.exit(0)
+    if not args[1] in subcommandList:
+        printinfo(helpinfoList['help'])
+        sys.exit(1)
+    else:
+        argdict['subcommand'] = args[1]
+    if argdict['subcommand'] == 'help':
+        if length == 2:
+            printinfo(helpinfoList['help'])
+            sys.exit(0)
+        if args[2] in subcommandList:
+            printinfo(helpinfoList[args[2]])
+            sys.exit(0)
+        else:
+            print("\nspecified subcommand is not supported!\n  More info: comtrade help\n")
+            sys.exit(1)
+    else:
+        if length == 2:
+            printinfo(helpinfoList[argdict['subcommand']])
+            sys.exit(1)
+    for i in range(2, length):
         if args[i][0] == '-':
             if len(args[i]) == 2:
                 if args[i] == '-h':
                     argdict['-h'] = True
-                elif args[i] == '-s':
-                    argdict['-s'] = True
                 elif args[i] == '-c':
                     if i >= length - 1:
                         print("the option -c has no specified format, please check help info: comtrade -h")
@@ -89,7 +150,7 @@ def parseargs(argdict, args=sys.argv):
             print('have no valid file or direction, please check if specify a file or direction!\nmore info: comtrade -h')
             sys.exit(1)
         else:
-            printinfo()
+            printinfo(helpinfoList[argdict['subcommand']])
             sys.exit(0)
     fileordir = op.abspath(args[-1])
     if op.isdir(fileordir):
@@ -123,37 +184,43 @@ def scancfgfile(dirpath):
             cfgfiles.append(each)
     return cfgfiles
 
+helpinfoList = inithelpinfo()
 argdict = initargs()
 argdict = parseargs(argdict, sys.argv)
 
 if argdict['-h'] == True:
-    printinfo()
+    printinfo(helpinfoList[argdict['subcommand']])
     sys.exit(0)
 
-if argdict['object'] == 'file':
-    print('parsing the file: %s ...' % argdict['path'])
-    parser = parsewave(argdict['path'], argdict['-c'])
-    if parser.result == 'parsed':
-        print('parsed! Export the %s file of channel-%s ...' % (argdict['-f'], argdict['-c']))
-        parser.savefig(argdict['-f'])
-        print('Done!')
-        if argdict['-s'] == True:
-            parser.show()
-    else:
-        print('\nParse [%s] failed! Error: %s\n' % (argdict['path'], parser.result))
-else:
-    cfgfiles = scancfgfile(argdict['path'])
-    if len(cfgfiles) == 0:
-        print("%s has no comtrade file!" % argdict['path'])
-        sys.exit(0)
-    print("parsing the %d file:" % len(cfgfiles))
-    for cfgfile in cfgfiles:
-        print("  %s ..." % cfgfile)
-        parser = parsewave(cfgfile, argdict['-c'])
+if argdict['subcommand'] == 'convert':
+    if argdict['object'] == 'file':
+        print('parsing the file: %s ...' % argdict['path'])
+        parser = parsewave(argdict['path'], argdict['-c'])
         if parser.result == 'parsed':
-            print('    parsed! Export the %s file of %s channel ...' % (argdict['-f'], argdict['-c']))
+            print('parsed! Export the %s file of channel-%s ...' % (argdict['-f'], argdict['-c']))
             parser.savefig(argdict['-f'])
+            print('Done!')
         else:
             print('\nParse [%s] failed! Error: %s\n' % (argdict['path'], parser.result))
-    print('Done!')
+    else:
+        cfgfiles = scancfgfile(argdict['path'])
+        if len(cfgfiles) == 0:
+            print("%s has no comtrade file!" % argdict['path'])
+            sys.exit(0)
+        print("parsing the %d file:" % len(cfgfiles))
+        for cfgfile in cfgfiles:
+            print("  %s ..." % cfgfile)
+            parser = parsewave(cfgfile, argdict['-c'])
+            if parser.result == 'parsed':
+                print('    parsed! Export the %s file of %s channel ...' % (argdict['-f'], argdict['-c']))
+                parser.savefig(argdict['-f'])
+            else:
+                print('\nParse [%s] failed! Error: %s\n' % (argdict['path'], parser.result))
+        print('Done!')
+elif argdict['subcommand'] == 'show':
+    if argdict['object'] == 'file':
+        parser = parsewave(argdict['path'], argdict['-c'])
+        parser.show()
+    else:
+        print("show command only support comtrade file not direction!")
 

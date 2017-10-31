@@ -27,30 +27,22 @@ pip3 install matplotlib numpy
 可以转换(并显示)comtrade波形文件，支持转换指定目录下的多个波形文件。帮助信息：
 
 ```sh
-➜  wave-guangxi comtrade -h
+➜  wave-guangxi comtrade help
 
-comtrade can convert comtrade files to pic file or csv data file. The tool can also show the wave figure. Addionally, It can convert multiple files in the dir.
+comtrade can convert comtrade files to pic file or csv data file. The tool can also show the wave figure. Addionally, It can convert multiple files in the dir. And it can diff two or more files to show data property!
 
 Usage:
-  comtrade [options [args]] [file/dir]
+  comtrade subcommand [options [args]] [file/dir]
 
-options:
-  -h: print the help infomation
-  -s: show the figure window
-  -f: set the file format convert to, with args specifying file format
+subcommand:
+  convert: convert the comtrade data to pic file or csv file;
+  diff: diff two or more wave data with speciied mode;
+  help: print comtrade help info or print specified sub-command help info;
+  show: show a wave figure for specify comtrade cfg file or dat file;
 
-args:
-  format: pdf, png, eps, svg, ps, csv
+  get help info of sub command:
+    comtrade help [subcommand]
 
-file/dir:
-  file: specify a couple of comtrade files
-  dir: specify a direction, convert the files in the direction
-
-Default:
-  default format is pdf.
-
-Example:
-  comtrade -f png xxx.cfg
 ```
 
 #### comtrade文件解析
