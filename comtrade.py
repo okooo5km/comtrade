@@ -18,9 +18,8 @@ import numpy as np
 import os.path as op
 import struct
 
-from pylab import *  
-mpl.rcParams['font.family'] = ['SimHei'] #指定默认字体  
-mpl.rcParams['axes.unicode_minus'] = False #解决保存图像是负号'-'显示为方块的问题 
+plt.rcParams['font.family'] = ['SimHei'] #指定默认字体  
+plt.rcParams['axes.unicode_minus'] = False #解决保存图像是负号'-'显示为方块的问题 
 
 class AnalogInfo:
     """
